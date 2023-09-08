@@ -1,0 +1,60 @@
+<div class="slds-card">
+    <div class="slds-card__header slds-grid">
+        <h2 class="slds-text-heading_small slds-truncate slds-p-around_small">
+            Account Information
+        </h2>
+    </div>
+    <div class="slds-card__body">
+        <div class="slds-form slds-form_stacked">
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="accountName">Account Name</label>
+                <div class="slds-form-element__control">
+                    <input type="text" id="accountName" class="slds-input" value={accountName} />
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="phone">Phone</label>
+                <div class="slds-form-element__control">
+                    <input type="text" id="phone" class="slds-input" value={phone} />
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="website">Website</label>
+                <div class="slds-form-element__control">
+                    <input type="text" id="website" class="slds-input" value={website} />
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="email">Email</label>
+                <div class="slds-form-element__control">
+                    <input type="email" id="email" class="slds-input" value={email} />
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label" for="startDate">Start Date</label>
+                <div class="slds-form-element__control">
+                    <input type="date" id="startDate" class="slds-input" value={startDate} />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slds-card__footer">
+        <div class="slds-grid slds-grid_align-end">
+            <lightning-button label="Update Information" onclick={handleUpdate} variant="brand"></lightning-button>
+            <lightning-button label="View/Send Documents" onclick={handleViewSend} variant="neutral"></lightning-button>
+        </div>
+        <div class={successMessageClass}>{successMessage}</div>
+    </div>
+</div>
+
+
+        <!-- Displaying Account names -->
+           <lightning-card title="Account List">
+           <ul>
+            <!-- <template for:each={accounts.data} for:item="account"> -->
+           <!-- <li key={account.Id}>{account.Name}</li> -->
+            <!-- </template> -->
+
+            </ul>
+        </lightning-card>
+</template>

@@ -1,0 +1,110 @@
+public with sharing class AccountController {
+
+    // This class represents a document linked to an account
+    public class Document {
+        @AuraEnabled
+        public Id Id { get; set; }
+
+        @AuraEnabled
+        public String Name { get; set; }
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Account> getAccountData() {
+        try {
+            // Fetch Account fields as needed
+            return [SELECT Id, Name, Phone, Website, Email__c, StartDate__c FROM Account LIMIT 1];
+        } catch (Exception e) {
+            return new List<Account>();
+        }
+    }
+@AuraEnabled
+    public static String sendEmailWithDocuments(Map<String, Object> emailData) {
+        try {
+            String toAddress = (String) emailData.get('toAddress');
+            String subject = (String) emailData.get('subject');
+            List<Id> documentIds = (List<Id>) emailData.get('documentIds');
+
+            // Create a SingleEmailMessage object
+            Messaging.SingleEmailMessage emailMsg = new Messaging.SingleEmailMessage();
+
+            // Set the email properties
+            emailMsg.setToAddresses(new List<String>{toAddress});
+            emailMsg.setSubject(subject);
+            emailMsg.setPlainTextBody('Please find attached documents:');
+
+            // Attach selected documents to the email
+            List<Messaging.EmailFileAttachment> attachments = new List<Messaging.EmailFileAttachment>();
+            for (Id documentId : documentIds) {
+                Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+                attachment.setFileName('Attachment'); // Set the attachment name
+                attachment.setBody([SELECT VersionData FROM ContentVersion WHERE ContentDocumentId = :documentId LIMIT 1].VersionData);
+                attachments.add(attachment);
+            }
+
+            // Set the email attachments
+            emailMsg.setFileAttachments(attachments);
+
+            // Send the email
+            Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{emailMsg});
+
+            // Return a success message
+            return 'Email sent successfully!';
+        } catch (Exception e) {
+            // Handle any exceptions and return an error message if needed
+            return 'An error occurred while sending the email: ' + e.getMessage();
+        }
+    }
+    
+    @AuraEnabled
+    public static String updateAccountInfo(String accountId, String accountName, String phone, String website, String email, Date startDate) {
+        try {
+            // Retrieve the account record
+            Account acc = [SELECT Id, Name, Phone, Website, Email__c, StartDate__c FROM Account WHERE Id = :accountId LIMIT 1];
+
+            if (acc != null) {
+                // Update the account fields based on the provided parameters
+                acc.Name = accountName;
+                acc.Phone = phone;
+                acc.Website = website;
+                acc.Email__c = email;
+                acc.StartDate__c = startDate;
+
+                // Update the account record
+                update acc;
+
+                // Return a success message
+                return 'Account information updated successfully!';
+            } else {
+                return 'Account not found with the specified ID.';
+            }
+        } catch (Exception e) {
+            // Handle any exceptions and return an error message if needed
+            return 'An error occurred while updating account information: ' + e.getMessage();
+        }
+    }
+
+    @AuraEnabled
+    public static List<Document> getAccountDocuments(String accountId) {
+        try {
+            // Query for documents related to the account
+            List<ContentDocumentLink> documentLinks = [SELECT ContentDocument.Title
+                                                       FROM ContentDocumentLink
+                                                       WHERE LinkedEntityId = :accountId];
+
+            // Extract the document titles and return them
+            List<Document> documents = new List<Document>();
+            for (ContentDocumentLink link : documentLinks) {
+                Document doc = new Document();
+                doc.Id = link.ContentDocumentId;
+                doc.Name = link.ContentDocument.Title;
+                documents.add(doc);
+            }
+
+            return documents;
+        } catch (Exception e) {
+            // Handle any exceptions and return an error message if needed
+            return new List<Document>();
+        }
+    }
+}

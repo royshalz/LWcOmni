@@ -1,0 +1,16 @@
+/* flexCardAccountinfo.css */
+:host .slds-card__footer {
+    margin-top: 1rem;
+}
+
+:host .slds-success {
+    color: #2E7D32; /* Green color for success */
+}
+
+:host .slds-error {
+    color: #D50000; /* Red color for error */
+}
+
+:host .slds-hide {
+    display: none; /* Hide the message by default */
+}
